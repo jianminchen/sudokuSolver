@@ -38,20 +38,40 @@ namespace sudokuSolver3
                 }
                 System.Console.WriteLine();
             }
-        }
-        /*
-    void solveSudoku(vector<vector<char>> &board) {
-        pair<int, int> next = (board[0][0] == '.') ? make_pair(0, 0) : 
-                                                     getNextMissing(board, 0, 0);
-        solveSudokuRe(board, next.first, next.second);
-    }  */
 
-    /*
-     * source code from blog:
-     * https://github.com/yinlinglin/LeetCode/blob/master/SudokuSolver.h
-     * convert C++ code to C# code
-     *  
-     */
+            /*
+             * debug through the code 
+             */
+            char[][] board2 = new char[9][];
+
+            board2[0] = new char[] { '.', '.', '9', '7', '4', '8', '.', '.', '.' };
+            board2[1] = new char[] { '7', '.', '.', '.', '.', '.', '.', '.', '.' };
+            board2[2] = new char[] { '.', '2', '.', '1', '.', '9', '.', '.', '.' };
+            board2[3] = new char[] { '.', '.', '7', '.', '.', '.', '2', '4', '.' };
+            board2[4] = new char[] { '.', '6', '4', '.', '1', '.', '5', '9', '.' };
+            board2[5] = new char[] { '.', '9', '8', '.', '.', '.', '3', '.', '.' };
+            board2[6] = new char[] { '.', '.', '.', '8', '.', '3', '.', '2', '.' };
+            board2[7] = new char[] { '.', '.', '.', '.', '.', '.', '.', '.', '6' };
+            board2[8] = new char[] { '.', '.', '.', '2', '7', '5', '9', '.', '.' };
+
+            solveSudoku(board2); 
+        }
+        
+        public static void solveSudoku(char[][] board) {
+            KeyValuePair<int, int> kvP = new KeyValuePair<int, int>(0, 0); 
+
+            KeyValuePair<int, int> next =
+                 (board[0][0] == '.') ? kvP : getNextMissing(board, 0, 0);
+
+            solveSudokuRe(board, next.Key, next.Value);
+        }  
+
+     /*
+      * source code from blog:
+      * https://github.com/yinlinglin/LeetCode/blob/master/SudokuSolver.h
+      * convert C++ code to C# code
+      *  
+      */
     
       public static  bool solveSudokuRe(char[][]board, int row, int col) {
             if (row == 9) return true;
@@ -64,7 +84,10 @@ namespace sudokuSolver3
 
             for (int i = 0; i < possible.Count; ++i)
             {
-                board[row][col] = (char)possible[i];
+                object o = possible[i];
+                int val = Convert.ToInt16(o);
+
+                board[row][col] = (char)val;
 
                 if (solveSudokuRe(board, (int)next.Key, (int)next.Value))
                     return true;
@@ -95,6 +118,7 @@ namespace sudokuSolver3
         {
             while (true)
             {
+                // julia's comment: formula is very concise, excellent!
                 row = (col == 8) ? row + 1 : row;
                 col = (col + 1) % 9;
 
@@ -129,17 +153,44 @@ namespace sudokuSolver3
                 if (charInCols != '.')
                     value[charInCols - '1'] = true;
 
-                int newRow = row / 3 * 3 + i / 3; //  julia's comment: 
-                int newCol = col / 3 * 3 + i % 3; // julia's comment: 
+                //   julia's comment:
+                // spend 5 minutes to work out this formula 
+                // (row, col) (5,6)
+                // newRow = 5/3*3 + 5/3 = 4 
+                // newCol = 6/3 * 3 +6%3 = 6+0 = 6
+                // still confused ! 
+                // small 3 x 3 matrix, left top corner: (row/3, col/3)
+                // relative position to the left top corner: (i/3, i%3) 
+                // row shift: i/3
+                // column shift: i%3 - make sense
+                // so let julia rewrite this formula to make more readable 
 
+                /*  code from blog 
+                int newRow = row / 3 * 3 + i / 3;  
+                int newCol = col / 3 * 3 + i % 3;  
+                  */
+                /* julia comment: add some explanation variable */
+                
+                int leftTop_small3x3_x = row / 3 * 3;
+                int leftTop_small3x3_y = col / 3 * 3;
+                int rowShift = i / 3;
+                int colShift = i % 3;
+
+                int newRow = leftTop_small3x3_x + rowShift;
+                int newCol = leftTop_small3x3_y + colShift; 
+                
+                /* end of change by julia */
                 char c = board[newRow][newCol];
 
                 if (c != '.') value[c-'1'] = true;
             }
 
             for (int i = 0; i < 9; ++i)
-                if (!value[i]) 
-                    possible.Add(i+'1');
+                if (!value[i])
+                {
+                    int val = i + '1';
+                    possible.Add(val);
+                }
             }
         }
 }
