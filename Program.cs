@@ -131,13 +131,9 @@ namespace SudokoSolver
                     { // 说明在当前空格找到一个满足条件的数字  
                         board[x][y] = tryItOut;
 
-                        int nextX = x;
-                        int nextY = y + 1;
-                        if (nextY == 9)
-                        {
-                            nextY = 0;
-                            nextX++;
-                        }
+                        int nextX = (y == 8) ? (x + 1) : x;
+                        int nextY = (y == 8) ? 0 : (y + 1);                       
+                        
                         if (dfs(board, nextX, nextY))
                         { // 对下一个空格搜索数字，如果下一个位置找到满足条件的数字，就此返回。
                             // 否则改变当前空格的数字继续测试
@@ -152,13 +148,9 @@ namespace SudokoSolver
             }
             else
             {                     // 如果当前已经有数字，就跳过继续深搜  
-                int nextX = x;
-                int nextY = y + 1;
-                if (nextY == 9)
-                {
-                    nextY = 0;
-                    nextX++;
-                }
+                int nextX = (y == 8) ? (x + 1) : x;
+                int nextY = (y == 8) ? 0 : (y + 1);   
+
                 return dfs(board, nextX, nextY);
             }
 
@@ -173,7 +165,7 @@ namespace SudokoSolver
                     return false;
                 }
                 if (board[x][i] == k)
-                {           // 同行检查  
+                {      // 同行检查  
                     return false;
                 }
             }
